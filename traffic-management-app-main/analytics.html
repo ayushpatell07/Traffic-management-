@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Analytics</title>
+    <link rel="stylesheet" href="smart.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="traffic-management-app">
+        <!-- Navigation Bar -->
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="control.html">Control Panel</a></li>
+                <li><a href="analytics.html">Analytics</a></li>
+            </ul>
+        </nav>
+
+        <h1>Traffic Analytics</h1>
+        <p>Insights and visualizations on traffic patterns and behaviors.</p>
+
+        <!-- Traffic Trend Graph -->
+        <div id="traffic-graph">
+            <h2>Traffic Count Over Time</h2>
+            <canvas id="traffic-trend-chart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Traffic Analysis Summary -->
+        <div id="analytics-info">
+            <h2>Traffic Summary</h2>
+            <p id="average-traffic">Average Traffic: Calculating...</p>
+            <p id="peak-traffic">Peak Traffic: Calculating...</p>
+            <p id="congestion-level">Current Congestion Level: Calculating...</p>
+            <p id="incident-reports">Incident Reports: None</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div id="filter-options">
+            <h2>Filter Data</h2>
+            <label for="time-period">Select Time Period:</label>
+            <select id="time-period">
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+            </select>
+            <button id="apply-filter">Apply Filter</button>
+        </div>
+
+        <!-- Live Traffic Updates -->
+        <div id="live-traffic-updates">
+            <h2>Live Traffic Updates</h2>
+            <button id="start-live-updates">Start Live Updates</button>
+            <button id="stop-live-updates">Stop Live Updates</button>
+            <p id="live-status">Live updates are not active.</p>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+
+    <script>
+        // Initialize data and variables
+        let trafficData = {
+            hourly: [30, 25, 40, 55, 60, 70, 80, 95, 85, 75, 65, 60],  // Sample traffic data for hourly traffic (vehicles per minute)
+            daily: [200, 250, 300, 350, 400, 450, 500],  // Sample traffic data for daily traffic (vehicles per day)
+            monthly: [5000, 4500, 4000, 3500, 3000, 2500, 2200, 2100, 2400, 2700, 3000, 3500]  // Monthly data
+        };
+
+        let currentTimePeriod = 'hourly';  // Default time period
+        let isLiveUpdatesActive = false;
+
+        // Create Traffic Trend Chart
+        const ctx = document.getElementById('traffic-trend-chart').getContext('2d');
+        const trafficTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: 12 }, (_, i) => i + 1),  // Labels for each data point (e.g., 1 to 12 for 12 hours)
+                datasets: [{
+                    label: 'Traffic Count (vehicles)',
+                    data: trafficData.hourly,  // Start with hourly data
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Function to update traffic summary based on selected time period
+        function updateTrafficSummary() {
+            const trafficCounts = trafficData[currentTimePeriod];
+            const totalTraffic = trafficCounts.reduce((acc, val) => acc + val, 0);
+            const averageTraffic = (totalTraffic / trafficCounts.length).toFixed(2);
+            const peakTraffic = Math.max(...trafficCounts);
+            const congestionLevel = (peakTraffic / 100) * 100;  // Assuming peak traffic defines congestion percentage
+            const incidentReports = Math.random() < 0.1 ? 'Accident reported' : 'None';  // Randomly simulate incidents
+
+            document.getElementById('average-traffic').textContent = `Average Traffic: ${averageTraffic} vehicles`;
+            document.getElementById('peak-traffic').textContent = `Peak Traffic: ${peakTraffic} vehicles`;
+            document.getElementById('congestion-level').textContent = `Current Congestion Level: ${congestionLevel}%`;
+            document.getElementById('incident-reports').textContent = `Incident Reports: ${incidentReports}`;
+        }
+
+        // Function to apply the selected time filter
+        document.getElementById('apply-filter').addEventListener('click', function () {
+            const selectedPeriod = document.getElementById('time-period').value;
+            currentTimePeriod = selectedPeriod;
+
+            // Update graph data based on selected time period
+            trafficTrendChart.data.datasets[0].data = trafficData[currentTimePeriod];
+            trafficTrendChart.update();
+
+            // Update traffic summary for the selected time period
+            updateTrafficSummary();
+        });
+
+        // Start live traffic updates (simulating real-time updates every 5 seconds)
+        document.getElementById('start-live-updates').addEventListener('click', function () {
+            if (isLiveUpdatesActive) return;
+
+            isLiveUpdatesActive = true;
+            document.getElementById('start-live-updates').disabled = true;
+            document.getElementById('stop-live-updates').disabled = false;
+            document.getElementById('live-status').textContent = 'Live updates are active.';
+
+            // Simulate live updates for every 5 seconds
+            setInterval(function () {
+                if (!isLiveUpdatesActive) return;
+
+                // Randomly update traffic data for the selected period
+                trafficData[currentTimePeriod] = trafficData[currentTimePeriod].map(val => Math.floor(Math.random() * 100));
+                trafficTrendChart.data.datasets[0].data = trafficData[currentTimePeriod];
+                trafficTrendChart.update();
+
+                // Update traffic summary with new live data
+                updateTrafficSummary();
+            }, 5000);
+        });
+
+        // Stop live traffic updates
+        document.getElementById('stop-live-updates').addEventListener('click', function () {
+            isLiveUpdatesActive = false;
+            document.getElementById('start-live-updates').disabled = false;
+            document.getElementById('stop-live-updates').disabled = true;
+            document.getElementById('live-status').textContent = 'Live updates are not active.';
+        });
+
+        // Initialize the traffic summary on page load
+        updateTrafficSummary();
+    </script>
+</body>
+</html>

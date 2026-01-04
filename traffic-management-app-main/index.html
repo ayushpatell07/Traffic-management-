@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Traffic Management System - Home</title>
+    <link rel="stylesheet" href="smart.css">
+    <!-- Add Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="traffic-management-app">
+        <!-- Navigation Bar -->
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="control.html">Control Panel</a></li>
+                <li><a href="analytics.html">Analytics</a></li>
+            </ul>
+        </nav>
+
+        <h1>AI Traffic Management System</h1>
+        <p>Real-time monitoring and adaptive traffic light control for heavy traffic routes.</p>
+
+        <!-- Live Traffic Data Section -->
+        <div id="traffic-data">
+            <h2>Live Traffic Data</h2>
+            <ul id="traffic-list">
+                <!-- Real-time traffic data will be displayed here -->
+            </ul>
+        </div>
+
+        <!-- Traffic Light Status Section -->
+        <div id="traffic-light-status">
+            <h2>Traffic Light Status</h2>
+            <ul id="light-status-list">
+                <!-- Traffic light status will be displayed here -->
+            </ul>
+        </div>
+
+        <!-- Traffic Alerts Section -->
+        <div id="traffic-alerts">
+            <h2>Traffic Alerts</h2>
+            <ul id="alert-list">
+                <!-- Traffic alerts (e.g., accidents, congestion) will appear here -->
+            </ul>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div id="additional-info">
+            <h2>Additional Information</h2>
+            <p id="weather-info">Weather: Fetching data...</p>
+            <p id="road-conditions">Road Conditions: Clear</p>
+        </div>
+
+        <!-- Data Visualization: Traffic Volume Chart -->
+        <div id="traffic-volume-chart">
+            <h2>Traffic Volume - Last 24 Hours</h2>
+            <canvas id="traffic-volume-chart-canvas"></canvas>
+        </div>
+
+        <!-- System Notifications Section -->
+        <div id="system-notifications">
+            <h2>System Notifications</h2>
+            <ul id="notification-list">
+                <!-- System notifications will be displayed here -->
+            </ul>
+        </div>
+
+        <!-- Traffic Light Control Panel Section -->
+        <div id="light-control-panel">
+            <h2>Traffic Light Control</h2>
+            <label for="north-light">North Light:</label>
+            <select id="north-light">
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Red">Red</option>
+            </select>
+            <br>
+            <label for="south-light">South Light:</label>
+            <select id="south-light">
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Red">Red</option>
+            </select>
+            <br>
+            <label for="east-light">East Light:</label>
+            <select id="east-light">
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Red">Red</option>
+            </select>
+            <br>
+            <label for="west-light">West Light:</label>
+            <select id="west-light">
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Red">Red</option>
+            </select>
+            <br>
+            <button id="apply-light-changes">Apply Light Changes</button>
+        </div>
+
+        <!-- Traffic Map Visualization Section -->
+        <div id="traffic-map">
+            <h2>Traffic Route Map</h2>
+            <div id="map-container">
+                <!-- Placeholder for traffic map (can integrate services like Google Maps or Leaflet.js here) -->
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>

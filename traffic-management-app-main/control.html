@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel - Traffic Management</title>
+    <link rel="stylesheet" href="smart.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="traffic-management-app">
+        <!-- Navigation Bar -->
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="control.html">Control Panel</a></li>
+                <li><a href="analytics.html">Analytics</a></li>
+            </ul>
+        </nav>
+
+        <h1>Control Panel</h1>
+        <p>Adjust traffic light timings for different routes and monitor traffic flow in real-time.</p>
+
+        <!-- Traffic Light Timings Control -->
+        <div id="traffic-light-controls">
+            <h2>Set Traffic Light Timings</h2>
+            <label for="north-timer">North Timer (seconds):</label>
+            <input type="number" id="north-timer" value="30" min="10" max="60">
+            <br>
+            <label for="south-timer">South Timer (seconds):</label>
+            <input type="number" id="south-timer" value="30" min="10" max="60">
+            <br>
+            <label for="east-timer">East Timer (seconds):</label>
+            <input type="number" id="east-timer" value="30" min="10" max="60">
+            <br>
+            <label for="west-timer">West Timer (seconds):</label>
+            <input type="number" id="west-timer" value="30" min="10" max="60">
+            <br>
+            <button id="set-timer">Set Traffic Lights Timer</button>
+        </div>
+
+        <!-- Real-time Traffic Light Status -->
+        <div id="real-time-status">
+            <h2>Real-time Traffic Light Status</h2>
+            <ul id="traffic-status-list">
+                <!-- Traffic Light Status will be updated dynamically -->
+            </ul>
+        </div>
+
+        <!-- Traffic Flow Simulation -->
+        <div id="traffic-flow-simulation">
+            <h2>Traffic Flow Simulation</h2>
+            <p>Traffic Flow Simulation based on current timings:</p>
+            <canvas id="traffic-flow-chart" width="400" height="200"></canvas>
+            <button id="start-simulation">Start Simulation</button>
+            <button id="stop-simulation">Stop Simulation</button>
+        </div>
+
+        <!-- Emergency Overrides Section -->
+        <div id="emergency-overrides">
+            <h2>Emergency Overrides</h2>
+            <p>Select the direction to override the light for an emergency situation:</p>
+            <select id="override-direction">
+                <option value="North">North</option>
+                <option value="South">South</option>
+                <option value="East">East</option>
+                <option value="West">West</option>
+            </select>
+            <button id="activate-override">Activate Emergency Override</button>
+        </div>
+
+        <!-- Scheduled Timers -->
+        <div id="scheduled-timers">
+            <h2>Scheduled Timer Settings</h2>
+            <p>Set the time for scheduled changes in traffic light timings:</p>
+            <label for="scheduled-time">Scheduled Time (HH:MM):</label>
+            <input type="time" id="scheduled-time">
+            <label for="scheduled-duration">Duration (minutes):</label>
+            <input type="number" id="scheduled-duration" value="15" min="1" max="60">
+            <button id="set-scheduled-timer">Set Scheduled Timer</button>
+        </div>
+
+        <!-- Status Indicators -->
+        <div id="status-indicators">
+            <h2>Status Indicators</h2>
+            <ul id="status-list">
+                <li id="emergency-status">Emergency Override: Not Active</li>
+                <li id="timer-status">Timer Status: Active</li>
+                <li id="scheduled-status">Scheduled Timer: Not Set</li>
+            </ul>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+
+    <script>
+        // Variables to hold the traffic light status and timers
+        let timers = {
+            north: 30,
+            south: 30,
+            east: 30,
+            west: 30
+        };
+
+        let emergencyOverride = false;
+        let scheduledTimer = null;
+        let isSimulationActive = false;
+
+        // Function to update the real-time traffic light status
+        function updateTrafficLightStatus() {
+            const statusList = document.getElementById('traffic-status-list');
+            statusList.innerHTML = '';
+            for (const direction in timers) {
+                const statusItem = document.createElement('li');
+                statusItem.textContent = `${direction.charAt(0).toUpperCase() + direction.slice(1)} Light: ${timers[direction]} seconds remaining`;
+                statusList.appendChild(statusItem);
+            }
+        }
+
+        // Function to simulate traffic flow (using Chart.js)
+        function updateTrafficFlowChart() {
+            const ctx = document.getElementById('traffic-flow-chart').getContext('2d');
+            const trafficData = {
+                labels: ['North', 'South', 'East', 'West'],
+                datasets: [{
+                    label: 'Traffic Flow (Vehicles per minute)',
+                    data: [timers.north, timers.south, timers.east, timers.west],
+                    backgroundColor: ['red', 'blue', 'green', 'yellow'],
+                    borderColor: ['red', 'blue', 'green', 'yellow'],
+                    borderWidth: 1
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: trafficData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60
+                        }
+                    }
+                }
+            });
+        }
+
+        // Start Traffic Flow Simulation
+        document.getElementById('start-simulation').addEventListener('click', function() {
+            if (isSimulationActive) return;
+
+            isSimulationActive = true;
+            document.getElementById('start-simulation').disabled = true;
+            document.getElementById('stop-simulation').disabled = false;
+
+            // Start updating traffic status every second
+            setInterval(function() {
+                if (!isSimulationActive) return;
+
+                for (const direction in timers) {
+                    if (timers[direction] > 0) {
+                        timers[direction]--;
+                    } else {
+                        timers[direction] = 30; // Reset to default if it reaches zero
+                    }
+                }
+
+                updateTrafficLightStatus();
+                updateTrafficFlowChart();
+            }, 1000);
+        });
+
+        // Stop Traffic Flow Simulation
+        document.getElementById('stop-simulation').addEventListener('click', function() {
+            isSimulationActive = false;
+            document.getElementById('start-simulation').disabled = false;
+            document.getElementById('stop-simulation').disabled = true;
+        });
+
+        // Set Traffic Timers
+        document.getElementById('set-timer').addEventListener('click', function() {
+            timers.north = parseInt(document.getElementById('north-timer').value);
+            timers.south = parseInt(document.getElementById('south-timer').value);
+            timers.east = parseInt(document.getElementById('east-timer').value);
+            timers.west = parseInt(document.getElementById('west-timer').value);
+
+            updateTrafficLightStatus();
+            alert('Traffic light timers have been updated!');
+        });
+
+        // Emergency Override
+        document.getElementById('activate-override').addEventListener('click', function() {
+            const direction = document.getElementById('override-direction').value;
+            emergencyOverride = true;
+            timers[direction.toLowerCase()] = 0; // Set light to green immediately
+
+            document.getElementById('emergency-status').textContent = `Emergency Override: Active for ${direction}`;
+
+            updateTrafficLightStatus();
+        });
+
+        // Set Scheduled Timer
+        document.getElementById('set-scheduled-timer').addEventListener('click', function() {
+            const time = document.getElementById('scheduled-time').value;
+            const duration = document.getElementById('scheduled-duration').value;
+
+            scheduledTimer = { time: time, duration: duration };
+            document.getElementById('scheduled-status').textContent = `Scheduled Timer: ${time} for ${duration} minutes`;
+        });
+
+        // Initial Call to set default traffic light status
+        updateTrafficLightStatus();
+        updateTrafficFlowChart();
+    </script>
+</body>
+</html>
